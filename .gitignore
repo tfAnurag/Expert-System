@@ -1,24 +1,67 @@
-# Compiled class file
-*.class
+class CarIssue {
+  String description;
 
-# Log file
-*.log
+  public CarIssue(String description) {
+    this.description = description;
+  }
 
-# BlueJ files
-*.ctxt
+  public String getDescription() {
+    return description;
+  }
+}
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+class Symptom {
+  String name;
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+  public Symptom(String name) {
+    this.name = name;
+  }
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+  public String getName() {
+    return name;
+  }
+}
+Map<Symptom[], CarIssue> rules = new HashMap<>();
+
+Symptom[] symptoms1 = {new Symptom("crank-nostart"), new Symptom("lights-dim")};
+rules.put(symptoms1, new CarIssue("Dead battery"));
+
+Symptom[] symptoms2 = {new Symptom("crank-nostart"), new Symptom("lights-normal")};
+rules.put(symptoms2, new CarIssue("Spark plug or ignition issue"));
+
+// Add more rules here...
+
+public static List<Symptom> getSymptomsFromUser() {
+  Scanner scanner = new Scanner(System.in);
+  List<Symptom> symptoms = new ArrayList<>();
+  
+  // Loop to ask user about various symptoms
+  while (true) {
+    System.out.println("Enter symptom (or 'done' to finish): ");
+    String symptomName = scanner.nextLine();
+    if (symptomName.equalsIgnoreCase("done")) {
+      break;
+    }
+    symptoms.add(new Symptom(symptomName));
+  }
+  return symptoms;
+}
+public static CarIssue diagnose(List<Symptom> symptoms) {
+  Symptom[] userSymptoms = symptoms.toArray(new Symptom[symptoms.size()]);
+  for (Symptom[] ruleSymptoms : rules.keySet()) {
+    if (Arrays.equals(userSymptoms, ruleSymptoms)) {
+      return rules.get(ruleSymptoms);
+    }
+  }
+  return null;
+}
+public static void main(String[] args) {
+  List<Symptom> symptoms = getSymptomsFromUser();
+  CarIssue diagnosis = diagnose(symptoms);
+  
+  if (diagnosis != null) {
+    System.out.println("Possible cause: " + diagnosis.getDescription());
+  } else {
+    System.out.println("Diagnosis inconclusive. Consult a mechanic.");
+  }
+}
